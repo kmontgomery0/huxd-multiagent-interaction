@@ -1,10 +1,32 @@
-## A3: Multi‑agent Interaction
+## A3: The Advisory Panel - Multi-Agent Conversational AI
 
-This starter guides you to build a frame‑sensitive conversational system in SvelteKit. You will design and implement frame agents, an orchestrator, and a replier so the system adapts its tone/genre/goals based on context.
+A frame-sensitive multi-agent system that provides conversational responses through different advisory perspectives. This system features **4 distinct agents** and **2 orchestration strategies** based on Hymes' SPEAKING model.
 
-What you implement:
-- Agents in `src/lib/agents/*` 
-- Orchestrators in `src/lib/orchestrators/*` (also stubbed).
+### System Overview
+
+**Agents (each with distinct SPEAKING frame):**
+- **Mentor Agent**: Patient teacher focused on building understanding through structured guidance
+- **Skeptic Agent**: Critical thinker who questions assumptions and probes for logical rigor
+- **Enthusiast Agent**: Energetic advocate who explores possibilities and builds momentum
+- **Pragmatist Agent**: Practical advisor focused on concrete action steps and real-world constraints
+
+**Orchestrators:**
+- **Router Orchestrator**: Analyzes conversation context and selects the single most appropriate agent to respond
+- **Synthesizer Orchestrator**: Gathers perspectives from 2-3 relevant agents and weaves them into a cohesive response
+
+### Implementation Structure
+
+```
+src/lib/
+├── agents/
+│   ├── MentorAgent.js
+│   ├── SkepticAgent.js
+│   ├── EnthusiastAgent.js
+│   └── PragmatistAgent.js
+└── orchestrators/
+    ├── RouterOrchestrator.js
+    └── SynthesizerOrchestrator.js
+```
 
 ## Setup and Running the App
 

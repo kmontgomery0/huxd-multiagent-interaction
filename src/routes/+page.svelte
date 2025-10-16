@@ -4,10 +4,10 @@
   let input = '';
   let messages = [];
   let debugOpen = false;
-  let replierInput = null; // { frameSet, contextCount, agent, reasons }
+  let replierInput = null; // { frameSet, contextCount, agent, reasons, orchestratorType }
   let isLoading = false;
   let errorMsg = '';
-  
+  let orchestratorType = 'router'; // 'router' or 'synthesizer'
 
   onMount(() => {});
 
@@ -21,7 +21,7 @@
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: messages })
+      body: JSON.stringify({ history: messages, orchestratorType })
     });
     const data = await res.json();
     if (!res.ok || data?.error) {
@@ -34,6 +34,12 @@
       replierInput = data.replierInput || null;
     }
     isLoading = false;
+  }
+
+  function clearChat() {
+    messages = [];
+    replierInput = null;
+    errorMsg = '';
   }
 </script>
 
@@ -125,10 +131,35 @@
 </style>
 
 <div class="container">
-  <h1>A3: Multi-agent Interaction </h1>
-  <div class="subtle">Conversational demo</div>
+  <h1>The Advisory Panel</h1>
+  <div class="subtle">Multi-perspective conversational AI with 4 distinct agents</div>
+  
   <div class="toolbar" style="margin: 0.5rem 0 0.75rem 0;">
-    <button class="secondary" on:click={() => (debugOpen = !debugOpen)}>{debugOpen ? 'Hide' : 'Show'} Debug</button>
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <span style="color: #e5ebff; font-size: 0.9rem; font-weight: 500;">Mode:</span>
+      <button 
+        class={orchestratorType === 'router' ? '' : 'secondary'}
+        on:click={() => orchestratorType = 'router'}
+      >
+        Router
+      </button>
+      <button 
+        class={orchestratorType === 'synthesizer' ? '' : 'secondary'}
+        on:click={() => orchestratorType = 'synthesizer'}
+      >
+        Synthesizer
+      </button>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="secondary" on:click={clearChat}>Clear</button>
+      <button class="secondary" on:click={() => (debugOpen = !debugOpen)}>{debugOpen ? 'Hide' : 'Show'} Debug</button>
+    </div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.08); padding: 0.6rem 0.85rem; border-radius: 8px; margin-bottom: 0.75rem; color: #e5ebff; font-size: 0.85rem; line-height: 1.5;">
+    <strong>Agents:</strong> Mentor (teaching) • Skeptic (critical analysis) • Enthusiast (possibilities) • Pragmatist (action)<br/>
+    <strong>{orchestratorType === 'router' ? 'Router Mode' : 'Synthesizer Mode'}:</strong> 
+    {orchestratorType === 'router' ? 'Selects the single best agent for each response' : 'Combines insights from 2-3 agents into one unified response'}
   </div>
 
   {#if errorMsg}
@@ -173,9 +204,10 @@
     <div><strong>Messages:</strong> {messages.length}</div>
     {#if replierInput}
       <div style="margin-top: 0.5rem;">
+        <div><strong>Orchestrator:</strong> {replierInput.orchestratorType || 'router'}</div>
         <div><strong>Context Count:</strong> {replierInput.contextCount}</div>
-        <div><strong>Agent:</strong> {replierInput.agent || 'n/a'}</div>
-        <div><strong>Reason:</strong> {replierInput.reasons || 'n/a'}</div>
+        <div><strong>Agent(s):</strong> {replierInput.agent || 'n/a'}</div>
+        <div><strong>Selection Reason:</strong> {replierInput.reasons || 'n/a'}</div>
         <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.35rem;">
           {#each Object.entries(replierInput.frameSet?.frames || {}) as [name, p]}
             <div><strong>{name}</strong>: {p?.value}</div>
