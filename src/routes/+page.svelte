@@ -11,6 +11,7 @@
   let timeOfDay = 'sunrise'; // 'sunrise', 'midday', 'sunset', 'dusk', 'night'
   let timeSlider = 0; // 0 = sunrise, 1 = midday, 2 = sunset, 3 = dusk, 4 = night
   let currentDateTime = new Date();
+  let apiKey = '';
 
   $: {
     const times = ['sunrise', 'midday', 'sunset', 'dusk', 'night'];
@@ -51,6 +52,12 @@
     
     document.body.className = timeOfDay;
     
+    // Load API key from localStorage
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      apiKey = savedKey;
+    }
+    
     // Update date/time every second
     const interval = setInterval(() => {
       currentDateTime = new Date();
@@ -58,6 +65,13 @@
     
     return () => clearInterval(interval);
   });
+
+  function saveApiKey() {
+    if (apiKey.trim()) {
+      localStorage.setItem('gemini_api_key', apiKey.trim());
+      errorMsg = '';
+    }
+  }
 
   function formatDate(date) {
     return date.toLocaleDateString('en-US', { 
@@ -116,6 +130,12 @@
   async function send() {
     const content = input.trim();
     if (!content) return;
+    
+    if (!apiKey.trim()) {
+      errorMsg = 'Please enter your Gemini API key first';
+      return;
+    }
+    
     messages = [...messages, { role: 'user', content }];
     input = '';
     isLoading = true;
@@ -123,7 +143,11 @@
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ history: messages, orchestratorType })
+      body: JSON.stringify({ 
+        history: messages, 
+        orchestratorType,
+        apiKey: apiKey.trim()
+      })
     });
     const data = await res.json();
     if (!res.ok || data?.error) {
@@ -360,6 +384,47 @@
   .bird-tooltip strong {
     display: block;
     margin-bottom: 0.15rem;
+  }
+
+  .api-key-row {
+    display: flex;
+    gap: 0.35rem;
+    align-items: center;
+    margin-top: 0.5rem;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+
+  .api-key-row:hover {
+    opacity: 1;
+  }
+
+  .api-key-label {
+    font-size: 0.65rem;
+    color: #6b7280;
+    text-transform: lowercase;
+  }
+
+  .api-key-input {
+    flex: 1;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-family: ui-monospace, monospace;
+    font-size: 0.65rem;
+    background: rgba(255, 255, 255, 0.5);
+    text-transform: none;
+  }
+
+  .api-key-input:focus {
+    outline: none;
+    border-color: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .api-key-input::placeholder {
+    font-size: 0.65rem;
+    opacity: 0.5;
   }
   
   .meta { color: var(--muted); font-size: 0.75rem; margin-bottom: 0.25rem; opacity: 0.7; }
@@ -616,7 +681,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </svelte:head>
 
-<div class="container">
+  <div class="container">
   <h1>news nest</h1>
   <div class="subtle">your cozy, unbiased guide to current events</div>
   
@@ -756,6 +821,19 @@
       style="flex: 1; padding: 0.6rem; border-radius: 6px; border: 1px solid #ddd;"
     />
     <button on:click={send}>send</button>
+  </div>
+
+  <!-- Subtle API Key Input -->
+  <div class="api-key-row">
+    <span class="api-key-label">api key:</span>
+    <input
+      type="password"
+      class="api-key-input"
+      placeholder="paste gemini key (stored locally)"
+      bind:value={apiKey}
+      on:change={saveApiKey}
+      on:blur={saveApiKey}
+    />
   </div>
 
   {#if debugOpen}
