@@ -1,34 +1,151 @@
-## A3: The Advisory Panel - Multi-Agent Conversational AI
+## 🕊️ news nest
 
-A frame-sensitive multi-agent system that provides conversational responses through different advisory perspectives. This system features **4 distinct agents** and **2 orchestration strategies** based on Hymes' SPEAKING model.
+A cozy, unbiased news chatbot that delivers current-event insights through multiple bird-themed "voices." Each voice reflects different ways of relating to information — not political bias, but human orientation toward news (curiosity, reflection, skepticism, care).
+
+### Mission
+
+Keep users informed without overwhelming them. Like a morning songbird or night owl, this chatbot delivers short, digestible insights that feel conversational, calming, and ritualistic — a gentle way to start or end your day.
+
+---
 
 ### System Overview
 
-**Agents (each with distinct SPEAKING frame):**
-- **Mentor Agent**: Patient teacher focused on building understanding through structured guidance
-- **Skeptic Agent**: Critical thinker who questions assumptions and probes for logical rigor
-- **Enthusiast Agent**: Energetic advocate who explores possibilities and builds momentum
-- **Pragmatist Agent**: Practical advisor focused on concrete action steps and real-world constraints
+**🐦 The Four Birds (each with distinct SPEAKING frame):**
 
-**Orchestrators:**
-- **Router Orchestrator**: Analyzes conversation context and selects the single most appropriate agent to respond
-- **Synthesizer Orchestrator**: Gathers perspectives from 2-3 relevant agents and weaves them into a cohesive response
+| Bird | Role | Focus | When Selected |
+|------|------|-------|---------------|
+| **🕊️ Dove** (Morning Dove) | Optimist/Connector | Uplifting tone, collective progress | Morning updates, worried users, community stories |
+| **🦉 Owl** | Reflective Analyst | Contextualizes with balanced wisdom | Evening updates, complex topics, "why does this matter?" |
+| **🐦 Wren** | Curious Fact-Finder | Crisp facts, verifies information | All updates (factual backbone), "what happened?" |
+| **🐦 Robin** | Everyday Citizen | Relates news to ordinary life | Personal relevance, "how does this affect me?" |
+
+**🎼 Two Orchestration Modes:**
+
+1. **Single Voice (Router)**: Selects ONE bird based on:
+   - Time of day (morning → Dove/Wren; evening → Owl)
+   - User mood/keywords ("worried" → Dove; "confused" → Owl; "curious" → Wren)
+   - Topic type (policy → Wren/Owl; community → Dove/Robin)
+
+2. **Blended Tweet (Synthesizer)**: Combines 2-3 birds into one cozy message:
+   - Always includes Wren for factual backbone
+   - Adds Dove (morning uplift) or Owl (evening reflection)
+   - Creates short, tweet-like messages with natural transitions
+
+---
+
+### Response Style
+
+- **Length**: 1-2 sentences, like a tweet or haiku
+- **Voice**: Warm, conversational, trustworthy
+- **Aesthetic**: Natural metaphors (weather, birds, time of day)
+- **Bias Strategy**: Frame differences (tone, focus, relevance) — not ideological divides
+- **Emotion Regulation**: Gently acknowledges worry, e.g., "Let's take this in slowly"
+
+---
 
 ### Implementation Structure
 
 ```
 src/lib/
 ├── agents/
-│   ├── MentorAgent.js
-│   ├── SkepticAgent.js
-│   ├── EnthusiastAgent.js
-│   └── PragmatistAgent.js
+│   ├── DoveAgent.js    (🕊️ Optimist/Connector)
+│   ├── OwlAgent.js     (🦉 Reflective Analyst)
+│   ├── WrenAgent.js    (🐦 Curious Fact-Finder)
+│   └── RobinAgent.js   (🐦 Everyday Citizen)
 └── orchestrators/
-    ├── RouterOrchestrator.js
-    └── SynthesizerOrchestrator.js
+    ├── RouterOrchestrator.js      (Single Voice selector)
+    └── SynthesizerOrchestrator.js (Blended Tweet creator)
 ```
 
-## Setup and Running the App
+---
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Set Up API Key
+
+```bash
+# Copy the example env file
+cp .env.example .env
+
+# Edit .env and add your Gemini API key
+# GEMINI_API_KEY=your_key_here
+```
+
+### 3. Run Development Server
+
+```bash
+npm run dev
+# Open http://localhost:5173
+```
+
+---
+
+## 🧪 Testing Your Songbird Companion
+
+### Single Voice Mode (Router)
+
+Try these prompts at different times of day:
+
+**Morning (should select Dove or Wren):**
+- "What's happening with climate negotiations?"
+- "Tell me something good in the news today"
+
+**Evening (should select Owl):**
+- "What happened with the policy vote today?"
+- "Why does the new regulation matter?"
+
+**Mood-based routing:**
+- "I'm worried about the economy" → Dove (uplifting)
+- "I'm curious what happened" → Wren (facts)
+- "I'm confused about this issue" → Owl (context)
+- "How does this affect my daily life?" → Robin (relevance)
+
+### Blended Tweet Mode (Synthesizer)
+
+Try questions that benefit from multiple perspectives:
+- "What's the latest on renewable energy?"
+- "Tell me about the community initiative that launched today"
+- "What should I know about today's news?"
+
+Expected: Short, cozy tweet-like messages (2-3 sentences) that blend factual info with uplifting or reflective context.
+
+---
+
+## 📱 Example Outputs
+
+**Single Voice - Dove (Morning):**
+> "Amidst tensions, communities are coming together to rebuild — a small sign of resilience. 🌱"
+
+**Single Voice - Owl (Evening):**
+> "Tonight's policy shift echoes earlier debates about privacy — a reminder that tech and trust evolve together. 🌙"
+
+**Single Voice - Wren:**
+> "Here's what's confirmed so far: new regulations will begin in 2026, pending Senate review."
+
+**Blended Tweet - Synthesizer:**
+> "Good evening. 🌙 New climate commitments announced today, with over 40 nations joining. Small steps forward — a reminder that collective action still happens, one agreement at a time."
+
+---
+
+## 🎯 Assignment Goals
+
+This chatbot demonstrates:
+
+✅ **4 distinct agents** with differentiated frames using SPEAKING model
+✅ **Router orchestrator** that selects single bird based on context
+✅ **Synthesizer orchestrator** that blends multiple perspectives
+✅ **Frame-sensitive design** focusing on tone/focus rather than political bias
+✅ **Cozy UX** designed to reduce news anxiety and doomscrolling
+
+---
+
+## Setup and Running the App (Detailed)
 
 Install required tools (choose per OS):
 - Node.js 20.x (includes npm)
@@ -37,16 +154,6 @@ Install required tools (choose per OS):
   - Linux: use your package manager or NodeSource installers
 - Git (to clone and manage the repo)
 - An editor (Cursor recommended)
-
-Clone and start the app:
-- `git clone <your-repo-url>`
-- `cd A3-Starter`
-- `cp .env.example .env` (you will fill it in Step 1)
-- `npm install`
-- `npm run dev`
-- Open `http://localhost:5173`
-
-At this point, you should have a working app that you can use to chat with the replier; however, the replier will not be able to use the Gemini API because you have not yet added your API key to `.env`.
 
 ## Getting Started with the Gemini API
 

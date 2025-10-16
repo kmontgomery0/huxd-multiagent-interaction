@@ -1,11 +1,11 @@
-// Router Orchestrator: Selects the single most appropriate agent for the context
-// This orchestrator analyzes the conversation and routes to exactly one agent
+// Router Orchestrator: Selects the single most appropriate bird agent
+// Routes based on time of day, user mood/keywords, and topic type
 
 import { geminiGenerate } from '../gemini.js';
-import { MentorAgent } from '../agents/MentorAgent.js';
-import { SkepticAgent } from '../agents/SkepticAgent.js';
-import { EnthusiastAgent } from '../agents/EnthusiastAgent.js';
-import { PragmatistAgent } from '../agents/PragmatistAgent.js';
+import { DoveAgent } from '../agents/DoveAgent.js';
+import { OwlAgent } from '../agents/OwlAgent.js';
+import { WrenAgent } from '../agents/WrenAgent.js';
+import { RobinAgent } from '../agents/RobinAgent.js';
 
 const SELECTION_SCHEMA = {
   type: 'OBJECT',
@@ -20,46 +20,53 @@ export class RouterOrchestrator {
   constructor() {
     this.name = 'router';
     this.agentByName = {
-      mentor: new MentorAgent(),
-      skeptic: new SkepticAgent(),
-      enthusiast: new EnthusiastAgent(),
-      pragmatist: new PragmatistAgent()
+      dove: new DoveAgent(),
+      owl: new OwlAgent(),
+      wren: new WrenAgent(),
+      robin: new RobinAgent()
     };
   }
 
   async _respondWith(agentName, contents) {
-    const agent = this.agentByName[agentName] || this.agentByName.pragmatist;
+    const agent = this.agentByName[agentName] || this.agentByName.wren;
     const res = await agent.respond(contents);
     return res?.text || '';
   }
 
   async orchestrate(contents) {
-    const orchestratorPrompt = `You are a routing system for a multi-perspective advisory panel.
-        Your job is to analyze the conversation and select the SINGLE most appropriate agent to respond.
+    // Get current hour to inform routing
+    const currentHour = new Date().getHours();
+    const timeContext = currentHour < 12 ? 'morning' : currentHour < 18 ? 'afternoon' : 'evening/night';
 
-        Available agents:
-        - "mentor": Patient teacher who explains concepts and builds understanding through structured guidance
-        - "skeptic": Critical thinker who questions assumptions and probes for logical rigor
-        - "enthusiast": Energetic advocate who explores possibilities and builds momentum
-        - "pragmatist": Practical advisor who focuses on concrete action steps and real-world constraints
+    const orchestratorPrompt = `You are the Orchestrator, responsible for routing each user query to the most suitable Songbird agent.
 
-        Routing guidelines:
-        1. Analyze the user's latest message AND recent conversation context
-        2. Consider what the user needs most right now:
-           - Understanding/learning → mentor
-           - Critical examination/validation → skeptic
-           - Inspiration/possibilities → enthusiast
-           - Action plan/next steps → pragmatist
-        3. Weight the latest message heavily, but use conversation history for context
-        4. Consider emotional tone: confusion/questions → mentor; doubt/concerns → skeptic; 
-           excitement/ideas → enthusiast; stuck/overwhelmed → pragmatist
-        5. Choose ONE agent—the best match for this moment
+      Current time context: ${timeContext}
 
-        Output ONLY as structured JSON:
-        {
-          "agent": "mentor",
-          "reasons": "User asking how something works; needs structured explanation"
-        }`;
+      Agents:
+      - dove: Morning Dove — uplifting, progress-focused
+      - owl: Owl — reflective, contextual
+      - wren: Wren — factual, concise
+      - robin: Robin — relatable, personal
+
+      Routing logic:
+      1. Time of day:
+        - Morning → Dove or Wren
+        - Evening/Night → Owl
+      2. User tone or keywords:
+        - "what happened", "explain", "details" → Wren
+        - "worried", "tired", "heavy" → Dove or Robin
+        - "why", "context", "meaning" → Owl or Robin
+      3. Topic type:
+        - Policy/technical → Wren or Owl
+        - Human interest → Dove or Robin
+        - Complex or developing → Owl
+
+      Output strictly in JSON:
+      {
+        "agent": "owl",
+        "reasons": "Evening query seeking context about a complex event"
+      }`;
+
 
     const result = await geminiGenerate({
       contents,
@@ -70,8 +77,8 @@ export class RouterOrchestrator {
       }
     });
 
-    let agent = 'pragmatist';
-    let reasons = 'Defaulted to pragmatist';
+    let agent = 'wren'; // Default to fact-finder
+    let reasons = 'Defaulted to Wren (fact-finder)';
     
     try {
       const parsed = JSON.parse(result.text || '{}');
@@ -91,8 +98,9 @@ export class RouterOrchestrator {
 
     const frameSet = { 
       frames: { 
-        persona: { value: agent, rationale: [reasons] },
-        orchestrator: { value: 'router', rationale: ['Single-agent routing'] }
+        bird: { value: agent, rationale: [reasons] },
+        time: { value: timeContext, rationale: [`Current time: ${timeContext}`] },
+        orchestrator: { value: 'router', rationale: ['Single-bird selection'] }
       } 
     };
     
@@ -104,4 +112,3 @@ export class RouterOrchestrator {
     };
   }
 }
-

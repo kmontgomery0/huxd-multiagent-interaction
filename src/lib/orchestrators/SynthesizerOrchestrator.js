@@ -1,11 +1,11 @@
-// Synthesizer Orchestrator: Combines insights from multiple agents into a cohesive response
-// This orchestrator gathers perspectives from relevant agents and weaves them together
+// Synthesizer Orchestrator: Blends multiple bird voices into one cozy, tweet-like message
+// Creates a unified daily insight by merging 2-3 agents
 
 import { geminiGenerate } from '../gemini.js';
-import { MentorAgent } from '../agents/MentorAgent.js';
-import { SkepticAgent } from '../agents/SkepticAgent.js';
-import { EnthusiastAgent } from '../agents/EnthusiastAgent.js';
-import { PragmatistAgent } from '../agents/PragmatistAgent.js';
+import { DoveAgent } from '../agents/DoveAgent.js';
+import { OwlAgent } from '../agents/OwlAgent.js';
+import { WrenAgent } from '../agents/WrenAgent.js';
+import { RobinAgent } from '../agents/RobinAgent.js';
 
 const AGENT_SELECTION_SCHEMA = {
   type: 'OBJECT',
@@ -23,34 +23,45 @@ export class SynthesizerOrchestrator {
   constructor() {
     this.name = 'synthesizer';
     this.agentByName = {
-      mentor: new MentorAgent(),
-      skeptic: new SkepticAgent(),
-      enthusiast: new EnthusiastAgent(),
-      pragmatist: new PragmatistAgent()
+      dove: new DoveAgent(),
+      owl: new OwlAgent(),
+      wren: new WrenAgent(),
+      robin: new RobinAgent()
     };
   }
 
   async orchestrate(contents) {
-    // Step 1: Determine which agents should contribute
-    const selectionPrompt = `You are selecting which advisory perspectives are most relevant for this conversation.
-        
-        Available agents:
-        - "mentor": Patient teacher who explains concepts and builds understanding
-        - "skeptic": Critical thinker who questions assumptions and probes logic
-        - "enthusiast": Energetic advocate who explores possibilities and momentum
-        - "pragmatist": Practical advisor focused on concrete action steps
+    // Get current hour for time-aware synthesis
+    const currentHour = new Date().getHours();
+    const timeContext = currentHour < 12 ? 'morning' : currentHour < 18 ? 'afternoon' : 'evening';
+    const greeting = currentHour < 12 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
 
-        Analyze the conversation and select 2-3 agents whose perspectives would be most valuable.
-        Consider:
-        - What does the user need? (understanding, validation, inspiration, action)
-        - What would add the most value? (avoid redundancy)
-        - Which perspectives complement each other well?
+    // Step 1: Determine which birds should contribute
+    const selectionPrompt = `You are the Synthesizer, choosing which Songbird agents should contribute to a blended response.
 
-        Output as JSON:
-        {
-          "agents": ["mentor", "skeptic"],
-          "reasons": "User needs both explanation and critical validation"
-        }`;
+      Current time: ${timeContext}
+
+      Agents:
+      - dove: uplifting
+      - owl: reflective
+      - wren: factual
+      - robin: relatable
+
+      Selection rules:
+      1. Always include Wren for factual grounding.
+      2. Add 1–2 complementary voices:
+        - Morning → add Dove
+        - Evening → add Owl
+        - Community or human-interest → add Robin
+        - Complex topics → add Owl
+      3. Avoid redundancy (e.g., Dove + Robin).
+
+      Output strictly in JSON:
+      {
+        "agents": ["wren", "dove"],
+        "reasons": "Morning update combining factual clarity with optimism"
+      }`;
+
 
     const selectionResult = await geminiGenerate({
       contents,
@@ -61,57 +72,60 @@ export class SynthesizerOrchestrator {
       }
     });
 
-    let selectedAgents = ['pragmatist', 'mentor'];
-    let selectionReasons = 'Default selection';
+    let selectedAgents = ['wren', 'dove']; // Default morning combo
+    let selectionReasons = 'Default morning selection';
 
     try {
       const parsed = JSON.parse(selectionResult.text || '{}');
       if (Array.isArray(parsed.agents) && parsed.agents.length > 0) {
         selectedAgents = parsed.agents
           .filter(a => this.agentByName[a])
-          .slice(0, 3); // Max 3 agents
+          .slice(0, 3); // Max 3 birds
       }
       if (parsed.reasons) {
         selectionReasons = String(parsed.reasons);
       }
     } catch (_) {}
 
-    // Step 2: Get responses from each selected agent
-    const agentResponses = await Promise.all(
+    // Step 2: Get responses from each selected bird
+    const birdResponses = await Promise.all(
       selectedAgents.map(async (agentName) => {
         const agent = this.agentByName[agentName];
         const res = await agent.respond(contents);
         return {
-          agent: agentName,
+          bird: agentName,
           response: res.text || ''
         };
       })
     );
 
-    // Step 3: Synthesize the responses into a cohesive message
-    const synthesisPrompt = `You are synthesizing multiple advisory perspectives into one cohesive response.
+    // Step 3: Synthesize into one cozy, tweet-like message
+    const synthesisPrompt = `You are creating a unified, tweet-like news update from multiple Songbird perspectives.
+
+        Time: ${timeContext}
         
-        You have received input from ${selectedAgents.length} different advisors, each with their own lens:
-        ${agentResponses.map(ar => `\n[${ar.agent.toUpperCase()}]: ${ar.response}`).join('\n')}
+        Bird contributions:
+        ${birdResponses.map(br => `[${br.bird.toUpperCase()}]: ${br.response}`).join('\n')}
 
         Your task:
-        1. Create a unified response that weaves together these perspectives naturally
-        2. Maintain the distinct voice/value of each perspective—don't flatten them
-        3. Structure the response so different angles complement rather than compete
-        4. Keep it conversational and coherent, not like a list of separate opinions
-        5. Aim for 2-4 paragraphs total
-        6. You can use transitions like "That said...", "At the same time...", "Building on that..."
+        1. Blend these into ONE cohesive message that feels like a cozy news tweet
+        2. Keep it SHORT: 2-3 sentences maximum (like a tweet or gentle notification)
+        3. CRITICAL: NO greetings ("Good morning", "Hello", "Good evening") — jump straight to the news content
+        4. Use natural transitions, not labeled sections
+        5. Maintain the warm, conversational tone but focus on the actual news
+        6. Include 1-2 relevant emojis naturally (🕊️ 🌙 🌅 🌱 etc.)
+        
+        Example format:
+        "[Wren fact]. [Owl wisdom] — a reminder that [insight]. 🌙"
+        
+        OR
+        
+        "[Wren fact]. [Dove uplift] 🌱."
 
-        Do NOT:
-        - Simply concatenate the responses
-        - Label sections by agent name
-        - Make it sound like a committee report
-        - Lose the distinct character of each perspective
-
-        Synthesize these viewpoints into a single, nuanced response that honors each lens.`;
+        Create your blended message now — keep it SHORT, warm, and digestible. NO greetings, just deliver the news insight directly.`;
 
     const lastUserMessage = contents[contents.length - 1];
-    const synthesisContents = [lastUserMessage]; // Just use the user's message for synthesis context
+    const synthesisContents = [lastUserMessage];
 
     const synthesisResult = await geminiGenerate({
       contents: synthesisContents,
@@ -120,13 +134,17 @@ export class SynthesizerOrchestrator {
 
     const frameSet = {
       frames: {
-        personas: { 
+        birds: { 
           value: selectedAgents.join(', '), 
           rationale: [selectionReasons] 
         },
+        time: {
+          value: timeContext,
+          rationale: [`${greeting} synthesis`]
+        },
         orchestrator: { 
           value: 'synthesizer', 
-          rationale: ['Multi-agent synthesis'] 
+          rationale: ['Multi-bird blend'] 
         }
       }
     };
@@ -139,4 +157,3 @@ export class SynthesizerOrchestrator {
     };
   }
 }
-
