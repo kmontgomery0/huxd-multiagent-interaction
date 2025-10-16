@@ -6,6 +6,18 @@ A cozy, unbiased news chatbot that delivers current-event insights through multi
 
 Keep users informed without overwhelming them. Like a morning songbird or night owl, this chatbot delivers short, digestible insights that feel conversational, calming, and ritualistic — a gentle way to start or end your day.
 
+### ✨ Key Features
+
+- **Time-Based Atmosphere**: Dynamic gradient backgrounds shift throughout the day (sunrise → midday → sunset → dusk → night) with a manual slider to adjust the ambiance
+- **Visual Bird Identity**: Each response shows a colored circle with the bird's emoji:
+  - 🕊️ Dove (amber) for uplifting perspectives
+  - 🦉 Owl (purple) for reflective wisdom
+  - 🐦 Wren (blue) for factual clarity
+  - 🐦 Robin (red) for relatable connections
+- **Pie Chart Visualization**: Blended responses show a pie chart circle divided by bird colors
+- **Smart Greeting**: Initial time-appropriate welcome message that disappears after first query
+- **No Greetings in Responses**: All bird responses jump straight to news content — no "Good morning" or pleasantries
+
 ---
 
 ### System Overview
@@ -36,10 +48,12 @@ Keep users informed without overwhelming them. Like a morning songbird or night 
 ### Response Style
 
 - **Length**: 1-2 sentences, like a tweet or haiku
-- **Voice**: Warm, conversational, trustworthy
-- **Aesthetic**: Natural metaphors (weather, birds, time of day)
+- **Voice**: Warm, conversational, trustworthy — but NO greetings after the initial welcome
+- **Visual Identity**: Each bird response shows a colored circle indicator (single bird) or pie chart (blended)
+- **Aesthetic**: Natural metaphors (weather, birds, time of day), minimal emojis (🕊️ 🌙 🌅 🌱)
 - **Bias Strategy**: Frame differences (tone, focus, relevance) — not ideological divides
-- **Emotion Regulation**: Gently acknowledges worry, e.g., "Let's take this in slowly"
+- **Emotion Regulation**: Gently acknowledges worry without being dismissive
+- **Initial Greeting**: Time-appropriate welcome ("good morning! 🌅 what would you like to explore today?") appears only on first load
 
 ---
 
@@ -88,23 +102,31 @@ npm run dev
 
 ## 🧪 Testing Your Songbird Companion
 
+### UI Features to Explore
+
+1. **Time-of-Day Slider**: Adjust the atmosphere (sunrise/midday/sunset/dusk/night) — background gradients change
+2. **Bird Legend**: Hover over the colored bird circles next to mode buttons to see descriptions
+3. **Mode Tooltips**: Hover over "single voice" and "blended tweet" buttons for explanations
+4. **Initial Greeting**: Refresh the page to see the time-appropriate welcome message
+5. **Visual Indicators**: Watch for colored circles (single voice) or pie charts (blended) next to responses
+
 ### Single Voice Mode (Router)
 
 Try these prompts at different times of day:
 
 **Morning (should select Dove or Wren):**
-- "What's happening with climate negotiations?"
-- "Tell me something good in the news today"
+- "What's happening with climate negotiations?" → 🕊️ amber circle or 🐦 blue circle
+- "Tell me something good in the news today" → 🕊️ amber circle
 
 **Evening (should select Owl):**
-- "What happened with the policy vote today?"
-- "Why does the new regulation matter?"
+- "What happened with the policy vote today?" → 🦉 purple circle
+- "Why does the new regulation matter?" → 🦉 purple circle
 
 **Mood-based routing:**
-- "I'm worried about the economy" → Dove (uplifting)
-- "I'm curious what happened" → Wren (facts)
-- "I'm confused about this issue" → Owl (context)
-- "How does this affect my daily life?" → Robin (relevance)
+- "I'm worried about the economy" → 🕊️ Dove (uplifting)
+- "I'm curious what happened" → 🐦 Wren (facts)
+- "I'm confused about this issue" → 🦉 Owl (context)
+- "How does this affect my daily life?" → 🐦 Robin (relevance)
 
 ### Blended Tweet Mode (Synthesizer)
 
@@ -113,23 +135,33 @@ Try questions that benefit from multiple perspectives:
 - "Tell me about the community initiative that launched today"
 - "What should I know about today's news?"
 
-Expected: Short, cozy tweet-like messages (2-3 sentences) that blend factual info with uplifting or reflective context.
+Expected: Short, tweet-like messages (2-3 sentences) with a **pie chart circle** showing which birds contributed (divided into colored segments).
 
 ---
 
 ## 📱 Example Outputs
 
-**Single Voice - Dove (Morning):**
-> "Amidst tensions, communities are coming together to rebuild — a small sign of resilience. 🌱"
+**Initial Greeting (appears only on page load):**
+> "good morning! 🌅 what would you like to explore today?"
+> 
+> *(Center-aligned, italic, subtle amber border — disappears after first query)*
 
-**Single Voice - Owl (Evening):**
-> "Tonight's policy shift echoes earlier debates about privacy — a reminder that tech and trust evolve together. 🌙"
+**Single Voice - Dove (amber circle):**
+> "Communities are coming together to rebuild — small signs of resilience emerging. 🌱"
 
-**Single Voice - Wren:**
-> "Here's what's confirmed so far: new regulations will begin in 2026, pending Senate review."
+**Single Voice - Owl (purple circle):**
+> "This policy shift echoes earlier privacy debates — tech and trust evolve together. 🌙"
 
-**Blended Tweet - Synthesizer:**
-> "Good evening. 🌙 New climate commitments announced today, with over 40 nations joining. Small steps forward — a reminder that collective action still happens, one agreement at a time."
+**Single Voice - Wren (blue circle):**
+> "Confirmed: new regulations begin in 2026, pending Senate review."
+
+**Blended Tweet - Synthesizer (pie chart of bird colors):**
+> "New climate commitments announced today, with over 40 nations joining. Small steps forward — collective action still happens, one agreement at a time. 🌱"
+
+**Visual Indicators:**
+- Single voice responses show a colored circle (36px) with the bird emoji on the left
+- Blended responses show a pie chart divided into segments by participating bird colors
+- Hover over bird circles in the toolbar to see descriptions
 
 ---
 
@@ -137,11 +169,13 @@ Expected: Short, cozy tweet-like messages (2-3 sentences) that blend factual inf
 
 This chatbot demonstrates:
 
-✅ **4 distinct agents** with differentiated frames using SPEAKING model
-✅ **Router orchestrator** that selects single bird based on context
-✅ **Synthesizer orchestrator** that blends multiple perspectives
-✅ **Frame-sensitive design** focusing on tone/focus rather than political bias
-✅ **Cozy UX** designed to reduce news anxiety and doomscrolling
+✅ **4 distinct agents** with differentiated frames using SPEAKING model  
+✅ **Router orchestrator** that selects single bird based on context  
+✅ **Synthesizer orchestrator** that blends multiple perspectives  
+✅ **Frame-sensitive design** focusing on tone/focus rather than political bias  
+✅ **Cozy UX** designed to reduce news anxiety and doomscrolling  
+✅ **Visual design system** with time-based gradients, bird color indicators, and pie chart synthesis  
+✅ **Thoughtful greeting UX** that welcomes users once, then focuses purely on content
 
 ---
 
