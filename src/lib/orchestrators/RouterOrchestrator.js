@@ -17,8 +17,9 @@ const SELECTION_SCHEMA = {
 };
 
 export class RouterOrchestrator {
-  constructor() {
+  constructor(apiKey = null) {
     this.name = 'router';
+    this.apiKey = apiKey;
     this.agentByName = {
       dove: new DoveAgent(),
       owl: new OwlAgent(),
@@ -29,7 +30,7 @@ export class RouterOrchestrator {
 
   async _respondWith(agentName, contents) {
     const agent = this.agentByName[agentName] || this.agentByName.wren;
-    const res = await agent.respond(contents);
+    const res = await agent.respond(contents, this.apiKey);
     return res?.text || '';
   }
 
@@ -74,7 +75,8 @@ export class RouterOrchestrator {
       config: { 
         responseMimeType: 'application/json', 
         responseSchema: SELECTION_SCHEMA 
-      }
+      },
+      apiKey: this.apiKey
     });
 
     let agent = 'wren'; // Default to fact-finder

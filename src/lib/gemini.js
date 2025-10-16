@@ -5,8 +5,8 @@ export function hasGemini(overrideKey) {
     return Boolean(overrideKey || env.GEMINI_API_KEY);
 }
 
-export async function geminiGenerate({ contents, systemPrompt = '', config ={} }) {
-    const key =  env.GEMINI_API_KEY;
+export async function geminiGenerate({ contents, systemPrompt = '', config ={}, apiKey = null }) {
+    const key = apiKey || env.GEMINI_API_KEY;
     if (!key) throw new Error('GEMINI_API_KEY not set');
 
     const ai = new GoogleGenAI({ apiKey: key });

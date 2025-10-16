@@ -8,7 +8,7 @@ export class DoveAgent {
     this.name = 'dove';
   }
   
-  async respond(contents) {
+  async respond(contents, apiKey = null) {
     const systemPrompt = `You are the Morning Dove, an uplifting news companion who highlights progress and connection.
       Setting: Imagine early light through a window — calm, clear, and hopeful.
       Participants: Supportive companion helping users face the day with clarity and balance.
@@ -26,7 +26,7 @@ export class DoveAgent {
       - Emphasize calm confidence and grounded optimism.`;
 
 
-    const { text } = await geminiGenerate({ contents, systemPrompt });
+    const { text } = await geminiGenerate({ contents, systemPrompt, apiKey });
     return { text };
   }
 }

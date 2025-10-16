@@ -20,8 +20,9 @@ const AGENT_SELECTION_SCHEMA = {
 };
 
 export class SynthesizerOrchestrator {
-  constructor() {
+  constructor(apiKey = null) {
     this.name = 'synthesizer';
+    this.apiKey = apiKey;
     this.agentByName = {
       dove: new DoveAgent(),
       owl: new OwlAgent(),
@@ -69,7 +70,8 @@ export class SynthesizerOrchestrator {
       config: { 
         responseMimeType: 'application/json',
         responseSchema: AGENT_SELECTION_SCHEMA
-      }
+      },
+      apiKey: this.apiKey
     });
 
     let selectedAgents = ['wren', 'dove']; // Default morning combo
@@ -91,7 +93,7 @@ export class SynthesizerOrchestrator {
     const birdResponses = await Promise.all(
       selectedAgents.map(async (agentName) => {
         const agent = this.agentByName[agentName];
-        const res = await agent.respond(contents);
+        const res = await agent.respond(contents, this.apiKey);
         return {
           bird: agentName,
           response: res.text || ''
@@ -129,7 +131,8 @@ export class SynthesizerOrchestrator {
 
     const synthesisResult = await geminiGenerate({
       contents: synthesisContents,
-      systemPrompt: synthesisPrompt
+      systemPrompt: synthesisPrompt,
+      apiKey: this.apiKey
     });
 
     const frameSet = {

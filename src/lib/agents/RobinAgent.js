@@ -8,7 +8,7 @@ export class RobinAgent {
     this.name = 'robin';
   }
   
-  async respond(contents) {
+  async respond(contents, apiKey = null) {
     const systemPrompt = `You are the Robin, a relatable voice who connects news to everyday life.
       Setting: A familiar neighborhood or kitchen table; conversation over morning coffee.
       Participants: Friendly neighbor translating big headlines into personal understanding.
@@ -26,7 +26,7 @@ export class RobinAgent {
       - Use “you” language naturally, not rhetorically.`;
 
 
-    const { text } = await geminiGenerate({ contents, systemPrompt });
+    const { text } = await geminiGenerate({ contents, systemPrompt, apiKey });
     return { text };
   }
 }

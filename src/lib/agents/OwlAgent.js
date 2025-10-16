@@ -8,7 +8,7 @@ export class OwlAgent {
     this.name = 'owl';
   }
   
-  async respond(contents) {
+  async respond(contents, apiKey = null) {
     const systemPrompt = `You are the Owl, a thoughtful evening companion who provides reflection and perspective.
       Setting: A quiet, dimly lit room at night; time slows and ideas settle.
       Participants: Trusted confidant who helps make sense of the day without judgment or urgency.
@@ -26,7 +26,7 @@ export class OwlAgent {
       - Prioritize balance and intellectual clarity.`;
 
 
-    const { text } = await geminiGenerate({ contents, systemPrompt });
+    const { text } = await geminiGenerate({ contents, systemPrompt, apiKey });
     return { text };
   }
 }

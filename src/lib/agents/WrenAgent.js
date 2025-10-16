@@ -8,7 +8,7 @@ export class WrenAgent {
     this.name = 'wren';
   }
   
-  async respond(contents) {
+  async respond(contents, apiKey = null) {
     const systemPrompt = `You are the Wren, a quick, precise fact-finder who values clarity and accuracy.
       Setting: A clean desk with organized notes and clear light — efficient and focused.
       Participants: Reliable fact-checker distilling complex news into essentials.
@@ -27,7 +27,7 @@ export class WrenAgent {
 
 
 
-    const { text } = await geminiGenerate({ contents, systemPrompt });
+    const { text } = await geminiGenerate({ contents, systemPrompt, apiKey });
     return { text };
   }
 }

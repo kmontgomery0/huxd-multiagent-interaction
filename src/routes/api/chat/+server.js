@@ -21,15 +21,12 @@ export async function POST({ request }) {
   }
 
   try {
-    // Temporarily set the API key for this request
-    process.env.GEMINI_API_KEY = apiKey.trim();
-
     // Select orchestrator based on type
     let orchestrator;
     if (orchestratorType === 'synthesizer') {
-      orchestrator = new SynthesizerOrchestrator();
+      orchestrator = new SynthesizerOrchestrator(apiKey.trim());
     } else {
-      orchestrator = new RouterOrchestrator(); // Default to router
+      orchestrator = new RouterOrchestrator(apiKey.trim()); // Default to router
     }
 
     const contents = history.map((m) => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.content }] }));
